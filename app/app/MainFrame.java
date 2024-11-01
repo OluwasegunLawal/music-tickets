@@ -47,9 +47,9 @@ public class MainFrame extends JFrame {
         musicalDetailsPanel = new MusicalDetailsPanel(this, orderManager);
         purchaseConfirmationPanel = new PurchaseConfirmationPanel(this, orderManager);
 
-        // mainContainer.add(MUSICALS_PANEL, musicalPanel);
-        // mainContainer.add(MUSICAL_DETAILS_PANEL, musicalDetailsPanel);
-        // mainContainer.add(PURCHASE_CONFIRMATION_PANEL, purchaseConfirmationPanel);
+//         mainContainer.add(MUSICALS_PANEL, musicalPanel);
+//         mainContainer.add(MUSICAL_DETAILS_PANEL, musicalDetailsPanel);
+//         mainContainer.add(PURCHASE_CONFIRMATION_PANEL, purchaseConfirmationPanel);
     }
 
     public CardLayout getCardLayout() {
