@@ -17,7 +17,7 @@ public class Helpers {
      * @param showBackButton Whether to include a back button
      * @return A configured JPanel containing the header elements
      */
-    public static JPanel getHeaderContainer(CardLayout cardLayout, JPanel mainContainer, String title, boolean showBackButton) {
+    public static JPanel getHeaderContainer(CardLayout cardLayout, JPanel mainContainer, String title, boolean showBackButton, String backTo) {
         JPanel headerContainer = new JPanel();
         headerContainer.setLayout(new BoxLayout(headerContainer, BoxLayout.X_AXIS));
         headerContainer.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
@@ -26,7 +26,7 @@ public class Helpers {
         if (showBackButton) {
             JButton backButton = new JButton("Back");
             backButton.setFont(new Font("Arial", Font.PLAIN, 16));
-            backButton.addActionListener(e -> switchToPanel(cardLayout, mainContainer, "MUSICALS"));
+            backButton.addActionListener(e -> switchToPanel(cardLayout, mainContainer, backTo));
             headerContainer.add(backButton);
             headerContainer.add(Box.createRigidArea(new Dimension(20, 0))); // Add spacing after back button
         }

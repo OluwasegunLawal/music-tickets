@@ -3,11 +3,13 @@ package musicals.panels;
 import musicals.MainFrame;
 import musicals.OrderManager;
 import musicals.models.Musical;
+import musicals.models.TicketType;
 import musicals.utils.Helpers;
 
 import javax.swing.*;
 import java.awt.*;
 import javax.imageio.ImageIO;
+import java.awt.event.ActionListener;
 import java.net.URL;
 import java.awt.image.BufferedImage;
 
@@ -23,6 +25,11 @@ public class MusicalDetailsPanel extends JPanel {
     private JLabel priceLabel;
     private JLabel durationLabel;
     private JLabel imageLabel;
+    private JComboBox<String> dateCombo;
+    private JComboBox<String> timeCombo;
+    private JComboBox<TicketType> ticketTypeCombo;
+    private JComboBox<Integer> seatsCombo;
+    private JLabel totalPriceLabel;
 
     /**
      * Constructor initializes the panel with main frame and order manager references.
@@ -35,9 +42,34 @@ public class MusicalDetailsPanel extends JPanel {
     }
 
     private void initializeComponents() {
-        // Create and add the header with navigation and back button
-        JPanel headerContainer = Helpers.getHeaderContainer(mainFrame.getCardLayout(), 
-            mainFrame.getMainContainer(), "Musical Details", true);
+        // Modify the header creation to include our reset logic
+        JPanel headerContainer = new JPanel();
+        headerContainer.setLayout(new BoxLayout(headerContainer, BoxLayout.X_AXIS));
+        headerContainer.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
+
+        JButton backButton = new JButton("Back");
+        backButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        backButton.addActionListener(e -> {
+            resetForm();  // Reset form before switching panels
+            Helpers.switchToPanel(mainFrame.getCardLayout(), mainFrame.getMainContainer(), "MUSICALS");
+        });
+        headerContainer.add(backButton);
+        headerContainer.add(Box.createRigidArea(new Dimension(20, 0)));
+
+        // Add the rest of the header components
+        JLabel welcomeLabel = new JLabel("Musical Details");
+        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        JButton startButton = new JButton("Musical List");
+        startButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        startButton.addActionListener(e -> {
+            resetForm();  // Reset form before switching panels
+            Helpers.switchToPanel(mainFrame.getCardLayout(), mainFrame.getMainContainer(), "MUSICALS");
+        });
+
+        headerContainer.add(welcomeLabel);
+        headerContainer.add(Box.createHorizontalGlue());
+        headerContainer.add(startButton);
+
         add(headerContainer, BorderLayout.NORTH);
 
         // Create main container with two-column layout
@@ -120,50 +152,77 @@ public class MusicalDetailsPanel extends JPanel {
         leftColumn.add(infoPanel, BorderLayout.SOUTH);
         
         // Right column setup - Booking options
-        JPanel rightColumn = new JPanel(new BorderLayout(0, 10));
+        JPanel rightColumn = new JPanel();
+        rightColumn.setLayout(new BoxLayout(rightColumn, BoxLayout.Y_AXIS));
         rightColumn.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createTitledBorder("Booking Options"),
-            BorderFactory.createEmptyBorder(10, 10, 10, 10)
+            BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         
         // Booking options panel
-        JPanel bookingPanel = new JPanel(new GridLayout(4, 2, 10, 20));
+        JPanel bookingPanel = new JPanel(new GridLayout(5, 2, 10, 5));
+        
+        dateCombo = new JComboBox<>(new String[]{"2024-03-20", "2024-03-21", "2024-03-22"});
+        timeCombo = new JComboBox<>(new String[]{"19:00", "20:00", "21:00"});
+        ticketTypeCombo = new JComboBox<>(TicketType.values());
+        seatsCombo = new JComboBox<>(new Integer[]{1, 2, 3, 4, 5, 6});
+        totalPriceLabel = new JLabel("£0.00");
         
         bookingPanel.add(new JLabel("Select Date:"));
-        bookingPanel.add(new JComboBox<>(new String[]{"2024-03-20", "2024-03-21", "2024-03-22"}));
+        bookingPanel.add(dateCombo);
         
         bookingPanel.add(new JLabel("Select Time:"));
-        bookingPanel.add(new JComboBox<>(new String[]{"19:00", "20:00", "21:00"}));
+        bookingPanel.add(timeCombo);
+        
+        bookingPanel.add(new JLabel("Ticket Type:"));
+        bookingPanel.add(ticketTypeCombo);
         
         bookingPanel.add(new JLabel("Number of Seats:"));
-        JComboBox<Integer> seatsCombo = new JComboBox<>(new Integer[]{1, 2, 3, 4, 5, 6});
         bookingPanel.add(seatsCombo);
         
         bookingPanel.add(new JLabel("Total Price:"));
-        JLabel totalPriceLabel = new JLabel("£0.00");
         bookingPanel.add(totalPriceLabel);
         
-        // Update total price when seat count changes
-        seatsCombo.addActionListener(e -> {
+        // Update total price when seat count or ticket type changes
+        ActionListener priceUpdater = e -> {
             Musical musical = orderManager.getSelectedMusical();
             if (musical != null) {
                 int seats = (Integer) seatsCombo.getSelectedItem();
-                double total = musical.getBasePrice() * seats;
+                TicketType ticketType = (TicketType) ticketTypeCombo.getSelectedItem();
+                double total = musical.getBasePrice() * seats * ticketType.getPriceMultiplier();
                 totalPriceLabel.setText(String.format("£%.2f", total));
             }
-        });
+        };
+
+        seatsCombo.addActionListener(priceUpdater);
+        ticketTypeCombo.addActionListener(priceUpdater);
         
-        rightColumn.add(bookingPanel, BorderLayout.CENTER);
+        rightColumn.add(bookingPanel);
+        rightColumn.add(Box.createVerticalGlue());
         
         // Create and add the bottom button panel
         JPanel buttonPanel = new JPanel();
         JButton submitButton = new JButton("Book Tickets");
         submitButton.addActionListener(e -> {
-            // TODO: Implement booking logic
-            JOptionPane.showMessageDialog(this, "Booking functionality coming soon!");
+            Musical musical = orderManager.getSelectedMusical();
+            if (musical != null) {
+                // Save booking details to OrderManager
+                orderManager.setBookingDetails(
+                    musical,
+                    (String) dateCombo.getSelectedItem(),
+                    (String) timeCombo.getSelectedItem(),
+                    (TicketType) ticketTypeCombo.getSelectedItem(),
+                    (Integer) seatsCombo.getSelectedItem(),
+                    Double.parseDouble(totalPriceLabel.getText().replace("£", ""))
+                );
+                
+                // Update and switch to confirmation panel
+                mainFrame.getConfirmationPanel().updateConfirmationDetails();
+                Helpers.switchToPanel(mainFrame.getCardLayout(), mainFrame.getMainContainer(), "PURCHASE_CONFIRMATION");
+            }
         });
         buttonPanel.add(submitButton);
-        rightColumn.add(buttonPanel, BorderLayout.SOUTH);
+        rightColumn.add(buttonPanel);
         
         // Add both columns to main container
         mainContainer.add(leftColumn);
@@ -197,5 +256,16 @@ public class MusicalDetailsPanel extends JPanel {
                 e.printStackTrace(); // For debugging
             }
         }
+    }
+
+    /**
+     * Resets all form fields to their default values
+     */
+    private void resetForm() {
+        dateCombo.setSelectedIndex(0);
+        timeCombo.setSelectedIndex(0);
+        ticketTypeCombo.setSelectedIndex(0);
+        seatsCombo.setSelectedIndex(0);
+        totalPriceLabel.setText("£0.00");
     }
 }

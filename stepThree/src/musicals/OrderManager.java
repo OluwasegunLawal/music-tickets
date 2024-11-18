@@ -3,6 +3,7 @@ package musicals;
 import musicals.models.Musical;
 import musicals.models.ShowTime;
 import musicals.models.Ticket;
+import musicals.models.TicketType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,11 @@ public class OrderManager {
     private Musical selectedMusical;
     // Selected show time for the order
     private ShowTime selectedShowTime;
+    private String bookingDate;
+    private String bookingTime;
+    private TicketType bookingTicketType;
+    private int bookingSeats;
+    private double bookingTotalPrice;
     
     /**
      * Constructs a new OrderManager with an empty list of selected tickets.
@@ -63,6 +69,23 @@ public class OrderManager {
     public Musical getSelectedMusical() {
         return selectedMusical;
     }
+    
+    public void setBookingDetails(Musical musical, String date, String time,
+                                  TicketType ticketType, int seats, double totalPrice) {
+        this.selectedMusical = musical;
+        this.bookingDate = date;
+        this.bookingTime = time;
+        this.bookingTicketType = ticketType;
+        this.bookingSeats = seats;
+        this.bookingTotalPrice = totalPrice;
+    }
+    
+    // Getter methods
+    public String getBookingDate() { return bookingDate; }
+    public String getBookingTime() { return bookingTime; }
+    public TicketType getBookingTicketType() { return bookingTicketType; }
+    public int getBookingSeats() { return bookingSeats; }
+    public double getBookingTotalPrice() { return bookingTotalPrice; }
     
     // Add getters and setters as needed
 } 

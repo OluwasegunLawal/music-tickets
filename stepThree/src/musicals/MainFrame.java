@@ -15,7 +15,7 @@ public class MainFrame extends JFrame {
 
     // Constants for window dimensions and navigation
     private static final int WIDTH = 1000;
-    private static final int HEIGHT = 1000;
+    private static final int HEIGHT = 700;
     private static final String TITLE = "London Musicals";
     // Card names for different panels in the CardLayout
     private static final String MUSICALS_PANEL = "MUSICALS";
@@ -67,7 +67,7 @@ public class MainFrame extends JFrame {
 
         mainContainer.add(MUSICALS_PANEL, musicalPanel);
         mainContainer.add(MUSICAL_DETAILS_PANEL, musicalDetailsPanel);
-        // mainContainer.add(PURCHASE_CONFIRMATION_PANEL, purchaseConfirmationPanel);
+         mainContainer.add(PURCHASE_CONFIRMATION_PANEL, purchaseConfirmationPanel);
     }
 
     /**
@@ -97,5 +97,9 @@ public class MainFrame extends JFrame {
 
     public MusicalDetailsPanel getMusicalDetailsPanel() {
         return musicalDetailsPanel;
+    }
+
+    public PurchaseConfirmationPanel getConfirmationPanel() {
+        return purchaseConfirmationPanel;
     }
 }

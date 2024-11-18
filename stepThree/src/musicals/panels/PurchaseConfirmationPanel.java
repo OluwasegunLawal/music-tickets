@@ -6,6 +6,10 @@ import musicals.utils.Helpers;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Panel that displays the purchase confirmation details and download options
@@ -14,6 +18,11 @@ import java.awt.*;
 public class PurchaseConfirmationPanel extends JPanel {
     private MainFrame mainFrame;
     private OrderManager orderManager;
+    private JLabel musicalLabel;
+    private JLabel dateLabel;
+    private JLabel seatsLabel;
+    private JLabel typeLabel;
+    private JLabel priceLabel;
 
     /**
      * Constructs a new PurchaseConfirmationPanel with references to main application components
@@ -37,28 +46,38 @@ public class PurchaseConfirmationPanel extends JPanel {
         
         // Create the header with navigation functionality
         JPanel headerContainer = Helpers.getHeaderContainer(mainFrame.getCardLayout(), 
-            mainFrame.getMainContainer(), "Purchase Confirmation", true);
+            mainFrame.getMainContainer(), "Purchase Confirmation", true, "MUSICAL_DETAILS");
         
-        // Add back button in a sub-header panel
-        JButton backButton = new JButton("Back");
-        JPanel subHeaderContainer = new JPanel(new BorderLayout());
-        subHeaderContainer.add(backButton, BorderLayout.WEST);
-
         // Create main content panel with padding
         JPanel contentContainer = new JPanel(new BorderLayout());
         contentContainer.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         // Create grid panel for purchase details
         JPanel detailsPanel = new JPanel();
-        detailsPanel.setLayout(new GridLayout(5, 1, 2, 2));
+        detailsPanel.setLayout(new GridLayout(5, 1, 1, 1));
+        detailsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
-        // Add label placeholders for order information
-        // TODO: These should be populated with actual order details
-        detailsPanel.add(new JLabel("Musical:"));
-        detailsPanel.add(new JLabel("Date:"));
-        detailsPanel.add(new JLabel("Seats:"));
-        detailsPanel.add(new JLabel("Ticket Type:"));
-        detailsPanel.add(new JLabel("Price:"));
+        // Initialize labels (without content)
+        musicalLabel = new JLabel();
+        dateLabel = new JLabel();
+        seatsLabel = new JLabel();
+        typeLabel = new JLabel();
+        priceLabel = new JLabel();
+        
+        // Set font for better readability
+        Font detailsFont = new Font("Arial", Font.PLAIN, 16);
+        musicalLabel.setFont(detailsFont);
+        dateLabel.setFont(detailsFont);
+        seatsLabel.setFont(detailsFont);
+        typeLabel.setFont(detailsFont);
+        priceLabel.setFont(detailsFont);
+        
+        // Add labels to details panel
+        detailsPanel.add(musicalLabel);
+        detailsPanel.add(dateLabel);
+        detailsPanel.add(seatsLabel);
+        detailsPanel.add(typeLabel);
+        detailsPanel.add(priceLabel);
         
         contentContainer.add(detailsPanel, BorderLayout.CENTER);
         
@@ -67,10 +86,9 @@ public class PurchaseConfirmationPanel extends JPanel {
         buttonContainer.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         
         JButton txtButton = new JButton("Download as TXT");
-        JButton pdfButton = new JButton("Download as PDF");
         
+        txtButton.addActionListener(e -> downloadAsText());
         buttonContainer.add(txtButton);
-        buttonContainer.add(pdfButton);
         
         // Add button container to the bottom
         add(buttonContainer, BorderLayout.SOUTH);
@@ -81,9 +99,74 @@ public class PurchaseConfirmationPanel extends JPanel {
         // Create main north container that will hold both header and subheader
         JPanel northContainer = new JPanel(new BorderLayout());
         northContainer.add(headerContainer, BorderLayout.NORTH);
-        northContainer.add(subHeaderContainer, BorderLayout.SOUTH);
-        
+
         // Add the combined north container instead of adding them separately
         add(northContainer, BorderLayout.NORTH);
+    }
+
+    /**
+     * Updates the confirmation details with the current booking information
+     */
+    public void updateConfirmationDetails() {
+        if (orderManager.getSelectedMusical() != null) {
+            musicalLabel.setText("Musical: " + orderManager.getSelectedMusical().getTitle());
+            dateLabel.setText("Date & Time: " + orderManager.getBookingDate() + " at " + orderManager.getBookingTime());
+            seatsLabel.setText("Number of Seats: " + orderManager.getBookingSeats());
+            typeLabel.setText("Ticket Type: " + orderManager.getBookingTicketType());
+            priceLabel.setText(String.format("Total Price: £%.2f", orderManager.getBookingTotalPrice()));
+        }
+    }
+
+    /**
+     * Downloads the booking details as a text file
+     */
+    private void downloadAsText() {
+        try {
+            // Create a timestamp for the filename
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+            String timestamp = now.format(formatter);
+            
+            // Create filename with timestamp
+            String filename = "booking_" + timestamp + ".txt";
+            
+            // Create the content
+            StringBuilder content = new StringBuilder();
+            content.append("=== Musical Ticket Booking Details ===\n\n");
+            content.append("Booking Reference: ").append(timestamp).append("\n");
+            content.append("Date: ").append(LocalDateTime.now().format(
+                DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"))).append("\n\n");
+            
+            // Add booking details
+            content.append("Musical: ").append(orderManager.getSelectedMusical().getTitle()).append("\n");
+            content.append("Performance Date: ").append(orderManager.getBookingDate()).append("\n");
+            content.append("Performance Time: ").append(orderManager.getBookingTime()).append("\n");
+            content.append("Ticket Type: ").append(orderManager.getBookingTicketType()).append("\n");
+            content.append("Number of Seats: ").append(orderManager.getBookingSeats()).append("\n");
+            content.append("Total Price: £").append(String.format("%.2f", orderManager.getBookingTotalPrice())).append("\n\n");
+            
+            content.append("=== Important Information ===\n");
+            content.append("Please arrive at least 30 minutes before the show.\n");
+            content.append("Present this booking confirmation at the ticket counter.\n");
+            content.append("No refunds are available for purchased tickets.\n");
+            
+            // Write to file
+            try (FileWriter writer = new FileWriter(filename)) {
+                writer.write(content.toString());
+            }
+            
+            // Show success message
+            JOptionPane.showMessageDialog(this,
+                "Booking details have been saved to " + filename,
+                "Download Successful",
+                JOptionPane.INFORMATION_MESSAGE);
+                
+        } catch (IOException ex) {
+            // Show error message if something goes wrong
+            JOptionPane.showMessageDialog(this,
+                "Error saving booking details: " + ex.getMessage(),
+                "Download Error",
+                JOptionPane.ERROR_MESSAGE);
+        }
     }
 } 

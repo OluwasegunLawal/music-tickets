@@ -98,7 +98,7 @@ public class MusicalPanel extends JPanel {
     private void initializeComponents() {
         // Create and add the header section with no back button
         JPanel headerContainer = Helpers.getHeaderContainer(mainFrame.getCardLayout(), 
-            mainFrame.getMainContainer(), "Welcome to London Musicals", false);
+            mainFrame.getMainContainer(), "Welcome to London Musicals", false, "");
         add(headerContainer, BorderLayout.NORTH);
 
         // Create panel to hold musical selection boxes with padding
