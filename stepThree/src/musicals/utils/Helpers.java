@@ -15,6 +15,7 @@ public class Helpers {
      * @param mainContainer The main container holding all panels
      * @param title The title text to display in the header
      * @param showBackButton Whether to include a back button
+     * @param backTo The panel name to switch to when the back button is clicked
      * @return A configured JPanel containing the header elements
      */
     public static JPanel getHeaderContainer(CardLayout cardLayout, JPanel mainContainer, String title, boolean showBackButton, String backTo) {

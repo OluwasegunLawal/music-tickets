@@ -42,7 +42,7 @@ public class MusicalDetailsPanel extends JPanel {
     }
 
     private void initializeComponents() {
-        // Modify the header creation to include our reset logic
+        // Header section with navigation buttons and title
         JPanel headerContainer = new JPanel();
         headerContainer.setLayout(new BoxLayout(headerContainer, BoxLayout.X_AXIS));
         headerContainer.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
@@ -72,11 +72,11 @@ public class MusicalDetailsPanel extends JPanel {
 
         add(headerContainer, BorderLayout.NORTH);
 
-        // Create main container with two-column layout
+        // Main content area split into two columns
         JPanel mainContainer = new JPanel(new GridLayout(1, 2, 20, 0));
         mainContainer.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
-        // Left column setup - Musical image and basic info
+        // Left column: Display musical poster and basic information
         JPanel leftColumn = new JPanel(new BorderLayout(0, 10));
         leftColumn.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createTitledBorder("Musical Information"),
@@ -87,7 +87,7 @@ public class MusicalDetailsPanel extends JPanel {
         JPanel imagePanel = new JPanel(new BorderLayout());
         imagePanel.setPreferredSize(new Dimension(300, 400));
         
-        // Initialize the image label
+        // Custom image label implementation to handle responsive image scaling
         imageLabel = new JLabel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -110,16 +110,16 @@ public class MusicalDetailsPanel extends JPanel {
                 g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, 
                                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 
-                // Calculate dimensions to cover the entire area
+                // Calculate scale to maintain aspect ratio while filling the space
                 double scale = Math.max(
                     (double) getWidth() / image.getWidth(),
                     (double) getHeight() / image.getHeight()
                 );
                 
+                // Center the scaled image in the available space
                 int scaledWidth = (int) (image.getWidth() * scale);
                 int scaledHeight = (int) (image.getHeight() * scale);
                 
-                // Center the image
                 int x = (getWidth() - scaledWidth) / 2;
                 int y = (getHeight() - scaledHeight) / 2;
                 
@@ -151,7 +151,7 @@ public class MusicalDetailsPanel extends JPanel {
         
         leftColumn.add(infoPanel, BorderLayout.SOUTH);
         
-        // Right column setup - Booking options
+        // Right column: Booking form with interactive price calculation
         JPanel rightColumn = new JPanel();
         rightColumn.setLayout(new BoxLayout(rightColumn, BoxLayout.Y_AXIS));
         rightColumn.setBorder(BorderFactory.createCompoundBorder(
@@ -183,10 +183,11 @@ public class MusicalDetailsPanel extends JPanel {
         bookingPanel.add(new JLabel("Total Price:"));
         bookingPanel.add(totalPriceLabel);
         
-        // Update total price when seat count or ticket type changes
+        // Setup price update listener for automatic total calculation
         ActionListener priceUpdater = e -> {
             Musical musical = orderManager.getSelectedMusical();
             if (musical != null) {
+                // Calculate total price based on base price, quantity, and ticket type
                 int seats = (Integer) seatsCombo.getSelectedItem();
                 TicketType ticketType = (TicketType) ticketTypeCombo.getSelectedItem();
                 double total = musical.getBasePrice() * seats * ticketType.getPriceMultiplier();
@@ -206,7 +207,7 @@ public class MusicalDetailsPanel extends JPanel {
         submitButton.addActionListener(e -> {
             Musical musical = orderManager.getSelectedMusical();
             if (musical != null) {
-                // Save booking details to OrderManager
+                // Store booking details in the OrderManager for later use
                 orderManager.setBookingDetails(
                     musical,
                     (String) dateCombo.getSelectedItem(),
@@ -216,7 +217,7 @@ public class MusicalDetailsPanel extends JPanel {
                     Double.parseDouble(totalPriceLabel.getText().replace("£", ""))
                 );
                 
-                // Update and switch to confirmation panel
+                // Update confirmation panel and navigate to it
                 mainFrame.getConfirmationPanel().updateConfirmationDetails();
                 Helpers.switchToPanel(mainFrame.getCardLayout(), mainFrame.getMainContainer(), "PURCHASE_CONFIRMATION");
             }

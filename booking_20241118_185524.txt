@@ -1,0 +1,16 @@
+=== Musical Ticket Booking Details ===
+
+Booking Reference: 20241118_185524
+Date: 18/11/2024 18:55:24
+
+Musical: Les Misérables
+Performance Date: 2024-03-20
+Performance Time: 19:00
+Ticket Type: ADULT
+Number of Seats: 1
+Total Price: £79.99
+
+=== Important Information ===
+Please arrive at least 30 minutes before the show.
+Present this booking confirmation at the ticket counter.
+No refunds are available for purchased tickets.

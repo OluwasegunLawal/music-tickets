@@ -31,6 +31,10 @@ public class MusicalPanel extends JPanel {
     // List component to display available show times
     private JList<ShowTime> showTimeList;
     private Map<Integer, Musical> musicals;
+    // Add this field to the class
+    private JComboBox<String> searchBox;
+    // Add this field at the top of the class with other fields
+    private JPanel countPanel;
 
     /**
      * Constructs a new MusicalPanel with references to main application components.
@@ -48,7 +52,6 @@ public class MusicalPanel extends JPanel {
 
     private void initializeMusicals() {
         musicals = new HashMap<>();
-        String imagePath = "https://ents24.imgix.net/image/000/359/294/2d712f2d711e6e6e683dce9fdb53aa0c639562c0.jpg?auto=format&fp-x=0.532&fp-y=0.023&crop=focalpoint&w=375&h=400&q=40";
         
         Musical phantom = new Musical(1, "The Phantom of the Opera", 
             "A mysterious phantom haunts an opera house in Paris", 89.99, 150);
@@ -101,94 +104,147 @@ public class MusicalPanel extends JPanel {
             mainFrame.getMainContainer(), "Welcome to London Musicals", false, "");
         add(headerContainer, BorderLayout.NORTH);
 
+        // Create search panel
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        searchBox = new JComboBox<>();
+        searchBox.setEditable(true);
+        searchBox.setPreferredSize(new Dimension(200, 25));
+        
+        // Add all musical titles to the search box
+        searchBox.addItem("All Musicals");
+        musicals.values().forEach(musical -> searchBox.addItem(musical.getTitle()));
+        
+        // Add search listener
+        searchBox.addActionListener(e -> {
+            String selected = (String) searchBox.getSelectedItem();
+            filterMusicals(selected);
+        });
+        
+        searchPanel.add(new JLabel("Search: "));
+        searchPanel.add(searchBox);
+        
+        // Add search panel below header
+        JPanel topContainer = new JPanel(new BorderLayout());
+        topContainer.add(headerContainer, BorderLayout.NORTH);
+        topContainer.add(searchPanel, BorderLayout.CENTER);
+        add(topContainer, BorderLayout.NORTH);
+
         // Create panel to hold musical selection boxes with padding
-        JPanel countPanel = new JPanel();
+        countPanel = new JPanel();
         countPanel.setLayout(new GridLayout(2, 4, 20, 20)); // Increased gaps between boxes
         countPanel.setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
 
         for (int i = 1; i <= 8; i++) {
             Musical musical = musicals.get(i);
-            
-            JPanel containerPanel = new JPanel();
-            containerPanel.setLayout(new BorderLayout());
-            containerPanel.setPreferredSize(new Dimension(300, 300)); // Make boxes bigger and square
-            
-            try {
-                // Load and scale the image
-                URL url = new URL(musical.getImagePath());
-                BufferedImage originalImage = ImageIO.read(url);
-                
-                // Create a custom JLabel for the image that maintains aspect ratio and fills
-                JLabel imageLabel = new JLabel() {
-                    @Override
-                    protected void paintComponent(Graphics g) {
-                        Graphics2D g2d = (Graphics2D) g;
-                        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, 
-                                           RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                        
-                        // Calculate dimensions to cover the entire area
-                        double scale = Math.max(
-                            (double) getWidth() / originalImage.getWidth(),
-                            (double) getHeight() / originalImage.getHeight()
-                        );
-                        
-                        int scaledWidth = (int) (originalImage.getWidth() * scale);
-                        int scaledHeight = (int) (originalImage.getHeight() * scale);
-                        
-                        // Center the image
-                        int x = (getWidth() - scaledWidth) / 2;
-                        int y = (getHeight() - scaledHeight) / 2;
-                        
-                        g2d.drawImage(originalImage, x, y, scaledWidth, scaledHeight, this);
-                    }
-                };
-                
-                imageLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-                containerPanel.add(imageLabel, BorderLayout.CENTER);
-                
-            } catch (Exception e) {
-                // Fallback to empty box if image loading fails
-                JPanel box = new JPanel();
-                box.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-                box.setPreferredSize(new Dimension(300, 300));
-                containerPanel.add(box, BorderLayout.CENTER);
-            }
-                
-            // Create info panel for details below the box
-            JPanel infoPanel = new JPanel();
-            infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-            
-            // Create labels and set their alignment to LEFT
-            JLabel titleLabel = new JLabel(musical.getTitle());
-            JLabel priceLabel = new JLabel(String.format("£%.2f", musical.getBasePrice()));
-            JLabel durationLabel = new JLabel(musical.getDurationMinutes() + " minutes");
-            JButton scheduleButton = new JButton("Show schedule");
-            scheduleButton.addActionListener(e -> {
-                orderManager.setSelectedMusical(musical);  // Store the selected musical
-                mainFrame.getMusicalDetailsPanel().updateMusicalDetails(); // Update the details panel
-                Helpers.switchToPanel(
-                    mainFrame.getCardLayout(),
-                    mainFrame.getMainContainer(),
-                    "MUSICAL_DETAILS"
-                );
-            });
-            
-            // Set alignment for all components
-            titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-            priceLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-            durationLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-            scheduleButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-            
-            infoPanel.add(titleLabel);
-            infoPanel.add(priceLabel);
-            infoPanel.add(durationLabel);
-            infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-            infoPanel.add(scheduleButton);
-            
-            containerPanel.add(infoPanel, BorderLayout.SOUTH);
-            
-            countPanel.add(containerPanel);
+            addMusicalPanel(musical);
         }
         add(countPanel, BorderLayout.CENTER);
+    }
+
+    // Add this new method to handle filtering
+    private void filterMusicals(String searchTerm) {
+        // Remove existing panels
+        Component[] components = countPanel.getComponents();
+        countPanel.removeAll();
+        
+        if (searchTerm == null || searchTerm.isEmpty() || searchTerm.equals("All Musicals")) {
+            // Show all musicals
+            for (int i = 1; i <= 8; i++) {
+                Musical musical = musicals.get(i);
+                addMusicalPanel(musical);
+            }
+        } else {
+            // Show only matching musicals
+            musicals.values().stream()
+                .filter(musical -> musical.getTitle().toLowerCase()
+                    .contains(searchTerm.toLowerCase()))
+                .forEach(this::addMusicalPanel);
+        }
+        
+        countPanel.revalidate();
+        countPanel.repaint();
+    }
+
+    // Extract the musical panel creation logic to a separate method
+    private void addMusicalPanel(Musical musical) {
+        JPanel containerPanel = new JPanel();
+        containerPanel.setLayout(new BorderLayout());
+        containerPanel.setPreferredSize(new Dimension(300, 300));
+        
+        try {
+            // Load and scale the image
+            URL url = new URL(musical.getImagePath());
+            BufferedImage originalImage = ImageIO.read(url);
+            
+            // Create a custom JLabel for the image that maintains aspect ratio and fills
+            JLabel imageLabel = new JLabel() {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    Graphics2D g2d = (Graphics2D) g;
+                    g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, 
+                                       RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                    
+                    // Calculate dimensions to cover the entire area
+                    double scale = Math.max(
+                        (double) getWidth() / originalImage.getWidth(),
+                        (double) getHeight() / originalImage.getHeight()
+                    );
+                    
+                    int scaledWidth = (int) (originalImage.getWidth() * scale);
+                    int scaledHeight = (int) (originalImage.getHeight() * scale);
+                    
+                    // Center the image
+                    int x = (getWidth() - scaledWidth) / 2;
+                    int y = (getHeight() - scaledHeight) / 2;
+                    
+                    g2d.drawImage(originalImage, x, y, scaledWidth, scaledHeight, this);
+                }
+            };
+            
+            imageLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            containerPanel.add(imageLabel, BorderLayout.CENTER);
+            
+        } catch (Exception e) {
+            // Fallback to empty box if image loading fails
+            JPanel box = new JPanel();
+            box.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            box.setPreferredSize(new Dimension(300, 300));
+            containerPanel.add(box, BorderLayout.CENTER);
+        }
+            
+        // Create info panel for details below the box
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        
+        // Create labels and set their alignment to LEFT
+        JLabel titleLabel = new JLabel(musical.getTitle());
+        JLabel priceLabel = new JLabel(String.format("£%.2f", musical.getBasePrice()));
+        JLabel durationLabel = new JLabel(musical.getDurationMinutes() + " minutes");
+        JButton scheduleButton = new JButton("Show schedule");
+        scheduleButton.addActionListener(e -> {
+            orderManager.setSelectedMusical(musical);  // Store the selected musical
+            mainFrame.getMusicalDetailsPanel().updateMusicalDetails(); // Update the details panel
+            Helpers.switchToPanel(
+                mainFrame.getCardLayout(),
+                mainFrame.getMainContainer(),
+                "MUSICAL_DETAILS"
+            );
+        });
+        
+        // Set alignment for all components
+        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        priceLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        durationLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        scheduleButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        infoPanel.add(titleLabel);
+        infoPanel.add(priceLabel);
+        infoPanel.add(durationLabel);
+        infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        infoPanel.add(scheduleButton);
+        
+        containerPanel.add(infoPanel, BorderLayout.SOUTH);
+        
+        countPanel.add(containerPanel);
     }
 } 

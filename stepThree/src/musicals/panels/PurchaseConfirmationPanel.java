@@ -44,20 +44,20 @@ public class PurchaseConfirmationPanel extends JPanel {
         // Set the window title
         mainFrame.setTitle("Purchase Confirmation");
         
-        // Create the header with navigation functionality
+        // Create the header with back button navigation to MUSICAL_DETAILS screen
         JPanel headerContainer = Helpers.getHeaderContainer(mainFrame.getCardLayout(), 
             mainFrame.getMainContainer(), "Purchase Confirmation", true, "MUSICAL_DETAILS");
         
-        // Create main content panel with padding
+        // Create main content panel with padding for better visual spacing
         JPanel contentContainer = new JPanel(new BorderLayout());
         contentContainer.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Create grid panel for purchase details
+        // Create grid panel for purchase details with 5 rows and equal spacing
         JPanel detailsPanel = new JPanel();
         detailsPanel.setLayout(new GridLayout(5, 1, 1, 1));
         detailsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
-        // Initialize labels (without content)
+        // Initialize labels that will be populated later with booking details
         musicalLabel = new JLabel();
         dateLabel = new JLabel();
         seatsLabel = new JLabel();
@@ -122,15 +122,15 @@ public class PurchaseConfirmationPanel extends JPanel {
      */
     private void downloadAsText() {
         try {
-            // Create a timestamp for the filename
+            // Generate unique timestamp for both filename and booking reference
             LocalDateTime now = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
             String timestamp = now.format(formatter);
             
-            // Create filename with timestamp
+            // Create filename in format: booking_YYYYMMDD_HHMMSS.txt
             String filename = "booking_" + timestamp + ".txt";
             
-            // Create the content
+            // Build the content with booking details and important information
             StringBuilder content = new StringBuilder();
             content.append("=== Musical Ticket Booking Details ===\n\n");
             content.append("Booking Reference: ").append(timestamp).append("\n");
@@ -150,19 +150,19 @@ public class PurchaseConfirmationPanel extends JPanel {
             content.append("Present this booking confirmation at the ticket counter.\n");
             content.append("No refunds are available for purchased tickets.\n");
             
-            // Write to file
+            // Write content to file and close automatically using try-with-resources
             try (FileWriter writer = new FileWriter(filename)) {
                 writer.write(content.toString());
             }
             
-            // Show success message
+            // Display success message with filename for user reference
             JOptionPane.showMessageDialog(this,
                 "Booking details have been saved to " + filename,
                 "Download Successful",
                 JOptionPane.INFORMATION_MESSAGE);
                 
         } catch (IOException ex) {
-            // Show error message if something goes wrong
+            // Display error dialog if file writing fails
             JOptionPane.showMessageDialog(this,
                 "Error saving booking details: " + ex.getMessage(),
                 "Download Error",

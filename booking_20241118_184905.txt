@@ -1,0 +1,16 @@
+=== Musical Ticket Booking Details ===
+
+Booking Reference: 20241118_184905
+Date: 18/11/2024 18:49:05
+
+Musical: The Phantom of the Opera
+Performance Date: 2024-03-20
+Performance Time: 19:00
+Ticket Type: ADULT
+Number of Seats: 2
+Total Price: £179.98
+
+=== Important Information ===
+Please arrive at least 30 minutes before the show.
+Present this booking confirmation at the ticket counter.
+No refunds are available for purchased tickets.

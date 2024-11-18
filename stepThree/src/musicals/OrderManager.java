@@ -1,7 +1,6 @@
 package musicals;
 
 import musicals.models.Musical;
-import musicals.models.ShowTime;
 import musicals.models.Ticket;
 import musicals.models.TicketType;
 
@@ -18,7 +17,6 @@ public class OrderManager {
     // Currently selected musical for the order
     private Musical selectedMusical;
     // Selected show time for the order
-    private ShowTime selectedShowTime;
     private String bookingDate;
     private String bookingTime;
     private TicketType bookingTicketType;
@@ -41,25 +39,12 @@ public class OrderManager {
     }
     
     /**
-     * Calculates the total price of all selected tickets.
-     * @return The sum of all ticket prices in the order
-     * TODO: Implement the calculation using stream operation (currently returns 0)
-     */
-    public double calculateTotal() {
-        return 0;
-        // return selectedTickets.stream()
-        //         .mapToDouble(Ticket::getFinalPrice)
-        //         .sum();
-    }
-    
-    /**
      * Clears the current order by removing all selected tickets,
      * selected musical, and selected show time.
      */
     public void clearOrder() {
         selectedTickets.clear();
         selectedMusical = null;
-        selectedShowTime = null;
     }
     
     public void setSelectedMusical(Musical musical) {
@@ -70,6 +55,17 @@ public class OrderManager {
         return selectedMusical;
     }
     
+    /**
+     * Sets all booking details for the current transaction in one method call.
+     * This includes the musical, date, time, ticket type, number of seats, and total price.
+     * 
+     * @param musical The selected musical performance
+     * @param date The selected show date
+     * @param time The selected show time
+     * @param ticketType The type of tickets being purchased (e.g., Adult, Child)
+     * @param seats The number of seats being booked
+     * @param totalPrice The total price for all tickets
+     */
     public void setBookingDetails(Musical musical, String date, String time,
                                   TicketType ticketType, int seats, double totalPrice) {
         this.selectedMusical = musical;
