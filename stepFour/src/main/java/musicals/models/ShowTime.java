@@ -30,4 +30,13 @@ public class ShowTime {
         this.dateTime = dateTime;
         this.availableSeats = availableSeats;
     }
-} 
+
+    public Musical getMusical() {
+        return musical;
+    }
+
+    public void setMusical(Musical musical) {
+        this.musical = musical;
+    }
+
+}

@@ -25,11 +25,6 @@ public class MusicalPanel extends JPanel {
     // Manages the ordering process and state
     private OrderManager orderManager;
     // List component to display available musicals
-    private JList<Musical> musicalList;
-    // Dropdown to select performance dates
-    private JComboBox<LocalDate> dateSelector;
-    // List component to display available show times
-    private JList<ShowTime> showTimeList;
     private Map<Integer, Musical> musicals;
     // Add this field to the class
     private JComboBox<String> searchBox;
@@ -144,7 +139,6 @@ public class MusicalPanel extends JPanel {
     // Add this new method to handle filtering
     private void filterMusicals(String searchTerm) {
         // Remove existing panels
-        Component[] components = countPanel.getComponents();
         countPanel.removeAll();
         
         if (searchTerm == null || searchTerm.isEmpty() || searchTerm.equals("All Musicals")) {

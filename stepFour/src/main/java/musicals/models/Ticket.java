@@ -41,7 +41,5 @@ public class Ticket {
         return 0;
         // return showTime.getMusical().getBasePrice() * ticketType.getPriceMultiplier();
     }
-    
-    // Getters and setters
-    // ... (implement standard getters/setters for all fields)
-} 
+
+}
