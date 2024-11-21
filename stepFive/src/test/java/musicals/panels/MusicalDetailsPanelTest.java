@@ -17,16 +17,8 @@ import java.lang.reflect.Method;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Test class for MusicalDetailsPanel
- * Tests the UI component behavior and data display functionality
- */
 class MusicalDetailsPanelTest {
 
-    // Mock objects are used instead of real implementations to:
-    // 1. Control their behavior in tests
-    // 2. Verify interactions
-    // 3. Avoid dependencies on actual UI state or database
     @Mock
     private MainFrame mainFrame;
     
@@ -40,38 +32,26 @@ class MusicalDetailsPanelTest {
     
     @BeforeEach
     void setUp() {
-        // Initialize Mockito annotations - this processes @Mock annotations
-        // and creates mock instances for all annotated fields
         MockitoAnnotations.openMocks(this);
         
-        // Setup MainFrame mock with required UI components
-        // CardLayout is needed because the panel uses it for navigation
-        // Container is required as it holds all the application panels
         CardLayout cardLayout = new CardLayout();
         JPanel container = new JPanel(cardLayout);
         when(mainFrame.getCardLayout()).thenReturn(cardLayout);
         when(mainFrame.getMainContainer()).thenReturn(container);
         
-        // Configure mock Musical with test data
-        // These values will be used to verify that the UI correctly displays
-        // all the musical information provided by the model
         when(musical.getTitle()).thenReturn("Test Musical");
         when(musical.getDescription()).thenReturn("Test Description");
         when(musical.getBasePrice()).thenReturn(50.0);
         when(musical.getDurationMinutes()).thenReturn(120);
         when(musical.getImagePath()).thenReturn("https://example.com/image.jpg");
         
-        // Create a fresh instance of the panel for each test
-        // This ensures test isolation and prevents state bleeding between tests
         panel = new MusicalDetailsPanel(mainFrame, orderManager);
     }
 
     @Test
     void resetForm_ShouldResetAllFieldsToDefault() {
-        // Act
         invokePrivateMethod(panel, "resetForm");
         
-        // Assert
         JComboBox<?> dateCombo = (JComboBox<?>) getPrivateField(panel, "dateCombo");
         JComboBox<?> timeCombo = (JComboBox<?>) getPrivateField(panel, "timeCombo");
         JComboBox<?> ticketTypeCombo = (JComboBox<?>) getPrivateField(panel, "ticketTypeCombo");
@@ -85,7 +65,6 @@ class MusicalDetailsPanelTest {
         assertEquals("£0.00", totalPriceLabel.getText());
     }
 
-    // Helper methods for accessing private fields and methods
     private Object getPrivateField(Object obj, String fieldName) {
         try {
             Field field = obj.getClass().getDeclaredField(fieldName);

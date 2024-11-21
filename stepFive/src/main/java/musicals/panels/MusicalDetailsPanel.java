@@ -13,9 +13,6 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 
-/**
- * Panel for displaying and managing musical event details and booking options.
- */
 public class MusicalDetailsPanel extends JPanel {
 
     private MainFrame mainFrame;
@@ -31,9 +28,6 @@ public class MusicalDetailsPanel extends JPanel {
     private JComboBox<Integer> seatsCombo;
     private JLabel totalPriceLabel;
 
-    /**
-     * Constructor initializes the panel with main frame and order manager references.
-     */
     public MusicalDetailsPanel(MainFrame mainFrame, OrderManager orderManager) {
         this.mainFrame = mainFrame;
         this.orderManager = orderManager;
@@ -42,7 +36,6 @@ public class MusicalDetailsPanel extends JPanel {
     }
 
     private void initializeComponents() {
-        // Header section with navigation buttons and title
         JPanel headerContainer = new JPanel();
         headerContainer.setLayout(new BoxLayout(headerContainer, BoxLayout.X_AXIS));
         headerContainer.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
@@ -50,19 +43,18 @@ public class MusicalDetailsPanel extends JPanel {
         JButton backButton = new JButton("Back");
         backButton.setFont(new Font("Arial", Font.PLAIN, 16));
         backButton.addActionListener(e -> {
-            resetForm();  // Reset form before switching panels
+            resetForm();  
             Helpers.switchToPanel(mainFrame.getCardLayout(), mainFrame.getMainContainer(), "MUSICALS");
         });
         headerContainer.add(backButton);
         headerContainer.add(Box.createRigidArea(new Dimension(20, 0)));
 
-        // Add the rest of the header components
         JLabel welcomeLabel = new JLabel("Musical Details");
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 24));
         JButton startButton = new JButton("Musical List");
         startButton.setFont(new Font("Arial", Font.PLAIN, 16));
         startButton.addActionListener(e -> {
-            resetForm();  // Reset form before switching panels
+            resetForm(); 
             Helpers.switchToPanel(mainFrame.getCardLayout(), mainFrame.getMainContainer(), "MUSICALS");
         });
 
@@ -72,22 +64,18 @@ public class MusicalDetailsPanel extends JPanel {
 
         add(headerContainer, BorderLayout.NORTH);
 
-        // Main content area split into two columns
         JPanel mainContainer = new JPanel(new GridLayout(1, 2, 20, 0));
         mainContainer.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
-        // Left column: Display musical poster and basic information
         JPanel leftColumn = new JPanel(new BorderLayout(0, 10));
         leftColumn.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createTitledBorder("Musical Information"),
             BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
         
-        // Create a panel to hold the image label
         JPanel imagePanel = new JPanel(new BorderLayout());
         imagePanel.setPreferredSize(new Dimension(300, 400));
         
-        // Custom image label implementation to handle responsive image scaling
         imageLabel = new JLabel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -110,13 +98,11 @@ public class MusicalDetailsPanel extends JPanel {
                 g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, 
                                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 
-                // Calculate scale to maintain aspect ratio while filling the space
                 double scale = Math.max(
                     (double) getWidth() / image.getWidth(),
                     (double) getHeight() / image.getHeight()
                 );
                 
-                // Center the scaled image in the available space
                 int scaledWidth = (int) (image.getWidth() * scale);
                 int scaledHeight = (int) (image.getHeight() * scale);
                 
@@ -132,7 +118,6 @@ public class MusicalDetailsPanel extends JPanel {
         imagePanel.add(imageLabel, BorderLayout.CENTER);
         leftColumn.add(imagePanel, BorderLayout.CENTER);
         
-        // Info panel
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         
@@ -151,7 +136,6 @@ public class MusicalDetailsPanel extends JPanel {
         
         leftColumn.add(infoPanel, BorderLayout.SOUTH);
         
-        // Right column: Booking form with interactive price calculation
         JPanel rightColumn = new JPanel();
         rightColumn.setLayout(new BoxLayout(rightColumn, BoxLayout.Y_AXIS));
         rightColumn.setBorder(BorderFactory.createCompoundBorder(
@@ -159,7 +143,6 @@ public class MusicalDetailsPanel extends JPanel {
             BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         
-        // Booking options panel
         JPanel bookingPanel = new JPanel(new GridLayout(5, 2, 10, 5));
         
         dateCombo = new JComboBox<>(new String[]{"2024-03-20", "2024-03-21", "2024-03-22"});
@@ -183,11 +166,9 @@ public class MusicalDetailsPanel extends JPanel {
         bookingPanel.add(new JLabel("Total Price:"));
         bookingPanel.add(totalPriceLabel);
         
-        // Setup price update listener for automatic total calculation
         ActionListener priceUpdater = e -> {
             Musical musical = orderManager.getSelectedMusical();
             if (musical != null) {
-                // Calculate total price based on base price, quantity, and ticket type
                 int seats = (Integer) seatsCombo.getSelectedItem();
                 TicketType ticketType = (TicketType) ticketTypeCombo.getSelectedItem();
                 double total = musical.getBasePrice() * seats * ticketType.getPriceMultiplier();
@@ -201,13 +182,11 @@ public class MusicalDetailsPanel extends JPanel {
         rightColumn.add(bookingPanel);
         rightColumn.add(Box.createVerticalGlue());
         
-        // Create and add the bottom button panel
         JPanel buttonPanel = new JPanel();
         JButton submitButton = new JButton("Book Tickets");
         submitButton.addActionListener(e -> {
             Musical musical = orderManager.getSelectedMusical();
             if (musical != null) {
-                // Store booking details in the OrderManager for later use
                 orderManager.setBookingDetails(
                     musical,
                     (String) dateCombo.getSelectedItem(),
@@ -217,7 +196,6 @@ public class MusicalDetailsPanel extends JPanel {
                     Double.parseDouble(totalPriceLabel.getText().replace("£", ""))
                 );
                 
-                // Update confirmation panel and navigate to it
                 mainFrame.getConfirmationPanel().updateConfirmationDetails();
                 Helpers.switchToPanel(mainFrame.getCardLayout(), mainFrame.getMainContainer(), "PURCHASE_CONFIRMATION");
             }
@@ -225,17 +203,12 @@ public class MusicalDetailsPanel extends JPanel {
         buttonPanel.add(submitButton);
         rightColumn.add(buttonPanel);
         
-        // Add both columns to main container
         mainContainer.add(leftColumn);
         mainContainer.add(rightColumn);
         
-        // Add main container to panel
         add(mainContainer, BorderLayout.CENTER);
     }
 
-    /**
-     * Updates the panel with the selected musical's information
-     */
     public void updateMusicalDetails() {
         Musical musical = orderManager.getSelectedMusical();
         if (musical != null) {
@@ -244,7 +217,6 @@ public class MusicalDetailsPanel extends JPanel {
             priceLabel.setText(String.format("Base Price: £%.2f", musical.getBasePrice()));
             durationLabel.setText(String.format("Duration: %d minutes", musical.getDurationMinutes()));
             
-            // Load and display the image
             try {
                 URL url = new URL(musical.getImagePath());
                 BufferedImage originalImage = ImageIO.read(url);
@@ -254,14 +226,11 @@ public class MusicalDetailsPanel extends JPanel {
             } catch (Exception e) {
                 imageLabel.setIcon(null);
                 imageLabel.setText("Image not available");
-                e.printStackTrace(); // For debugging
+                e.printStackTrace(); 
             }
         }
     }
 
-    /**
-     * Resets all form fields to their default values
-     */
     private void resetForm() {
         dateCombo.setSelectedIndex(0);
         timeCombo.setSelectedIndex(0);

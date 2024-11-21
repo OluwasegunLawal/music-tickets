@@ -20,28 +20,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-/**
- * Panel responsible for displaying musical selection interface.
- * This panel shows available musicals and allows users to select show times and dates.
- */
 public class MusicalPanel extends JPanel {
-    // Main application window reference
     private MainFrame mainFrame;
-    // Manages the ordering process and state
     private OrderManager orderManager;
-    // List component to display available musicals
     private Map<Integer, Musical> musicals;
-    // Add this field to the class
     private JComboBox<String> searchBox;
-    // Add this field at the top of the class with other fields
     private JPanel countPanel;
     private JButton uploadButton;
 
-    /**
-     * Constructs a new MusicalPanel with references to main application components.
-     * @param mainFrame The main application window
-     * @param orderManager The order management system
-     */
     public MusicalPanel(MainFrame mainFrame, OrderManager orderManager) {
         this.mainFrame = mainFrame;
         this.orderManager = orderManager;
@@ -120,10 +106,6 @@ public class MusicalPanel extends JPanel {
         filterMusicals("All Musicals");
     }
 
-    /**
-     * Initializes and arranges all UI components of the panel.
-     * Creates a header and a grid of musical selection boxes.
-     */
     private void initializeComponents() {
         // Create and add the header section with no back button
         JPanel headerContainer = Helpers.getHeaderContainer(mainFrame.getCardLayout(), 
@@ -170,7 +152,6 @@ public class MusicalPanel extends JPanel {
         add(countPanel, BorderLayout.CENTER);
     }
 
-    // Add this new method to handle filtering
     private void filterMusicals(String searchTerm) {
         // Remove existing panels
         countPanel.removeAll();
@@ -192,7 +173,6 @@ public class MusicalPanel extends JPanel {
         countPanel.repaint();
     }
 
-    // Extract the musical panel creation logic to a separate method
     private void addMusicalPanel(Musical musical) {
         JPanel containerPanel = new JPanel();
         containerPanel.setLayout(new BorderLayout());
@@ -277,7 +257,6 @@ public class MusicalPanel extends JPanel {
         countPanel.add(containerPanel);
     }
 
-    // Move existing musical initialization to a separate method
     private void addDefaultMusicals() {
         Musical phantom = new Musical(1, "The Phantom of the Opera", 
             "A mysterious phantom haunts an opera house in Paris", 89.99, 150);
